@@ -3,6 +3,8 @@ import time
 from src.environment import TaxiEnvironment
 from src.policy_iteration import PolicyIteration
 from src.animation import TaxiAnimator
+from src.value_iteration import ValueIteration
+
 
 def run_policy_iteration(env):
     """Run Policy Iteration and return results"""
@@ -47,6 +49,54 @@ def run_policy_iteration(env):
     
     return pi_policy, pi_time, avg_reward, avg_steps
 
+def test_policy(env, policy, num_tests=10, max_steps=100):
+    """Test a policy and return average performance"""
+    total_reward = 0
+    total_steps = 0
+    
+    for test in range(num_tests):
+        state = env.reset()
+        episode_reward = 0
+        steps = 0
+        
+        for step in range(max_steps):
+            action = np.argmax(policy[state])
+            state, reward, done = env.step(action)
+            episode_reward += reward
+            steps += 1
+            
+            if done:
+                break
+        
+        total_reward += episode_reward
+        total_steps += steps
+    
+    avg_reward = total_reward / num_tests
+    avg_steps = total_steps / num_tests
+    
+    return avg_reward, avg_steps
+
+def run_value_iteration(env):
+    """Run Value Iteration and return results"""
+    
+    print("\n" + "=" * 50)
+    print("VALUE ITERATION")
+    print("=" * 50)
+    
+    start_time = time.time()
+    vi_solver = ValueIteration(env, gamma=0.9)
+    vi_policy, vi_values = vi_solver.solve(max_iterations=1000)
+    vi_time = time.time() - start_time
+    
+    # Test policy performance
+    avg_reward, avg_steps = test_policy(env, vi_policy)
+    
+    print(f"Computation Time: {vi_time:.2f}s")
+    print(f"Average Reward: {avg_reward:.1f}")
+    print(f"Average Steps: {avg_steps:.1f}")
+    
+    return vi_policy, vi_time, avg_reward, avg_steps
+
 def main():
     # Create environment
     env = TaxiEnvironment(
@@ -81,6 +131,31 @@ def main():
     print("\n" + "=" * 50)
     print("DEMONSTRATION COMPLETE!")
     print("=" * 50)
+
+    # Value Iteration Demonstration
+
+    print("VALUE ITERATION DEMONSTRATION")
+    print(f"Grid Size: {env.grid_size}x{env.grid_size}")
+    print(f"States: {env.n_states}, Actions: {env.n_actions}")
+    print()
+    
+    # Run Value Iteration
+    vi_policy, vi_time, vi_reward, vi_steps = run_value_iteration(env)
+
+    print("\nCreating animation for Value Iteration...")
+    try:
+        animator = TaxiAnimator(env)
+        animator.create_animation(vi_policy, "Value Iteration")
+        print("✓ Value Iteration animation created!")
+    except Exception as e:
+        print(f"✗ Animation failed: {e}")
+    
+    print("\n" + "=" * 50)
+    print("DEMONSTRATION COMPLETE!")
+    print("=" * 50)
+
+    
+    # Create animation
 
 if __name__ == "__main__":
     main()
