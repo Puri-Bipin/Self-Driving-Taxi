@@ -89,16 +89,26 @@ class TaxiAnimator:
         for i in range(self.env.grid_size):
             for j in range(self.env.grid_size):
                 if (i, j) in self.env.obstacles:
-                    self.ax.text(j, i, '🚧', ha='center', va='center', fontsize=20)
+                    # Changed from '🚧' to 'X'
+                    self.ax.text(j, i, 'X', ha='center', va='center', fontsize=20, 
+                               fontweight='bold', color='red')
                 elif (i, j) == self.env.passenger_start:
-                    self.ax.text(j, i, '👤', ha='center', va='center', fontsize=20)
+                    # Changed from '👤' to 'P'
+                    self.ax.text(j, i, 'P', ha='center', va='center', fontsize=20, 
+                               fontweight='bold', color='blue')
                 elif (i, j) == self.env.destination:
-                    self.ax.text(j, i, '🏁', ha='center', va='center', fontsize=20)
+                    # Changed from '🏁' to 'D'
+                    self.ax.text(j, i, 'D', ha='center', va='center', fontsize=20, 
+                               fontweight='bold', color='green')
                 elif (i, j) == taxi_pos:
                     if passenger_status == 1:
-                        self.ax.text(j, i, '🚕👤', ha='center', va='center', fontsize=15)
+                        # Changed from '🚕👤' to 'T+P'
+                        self.ax.text(j, i, 'T+P', ha='center', va='center', fontsize=15, 
+                                   fontweight='bold', color='purple')
                     else:
-                        self.ax.text(j, i, '🚕', ha='center', va='center', fontsize=20)
+                        # Changed from '🚕' to 'T'
+                        self.ax.text(j, i, 'T', ha='center', va='center', fontsize=20, 
+                                   fontweight='bold', color='orange')
         
         # Add step info
         total_reward = sum(rewards_history[:frame_idx])
