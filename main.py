@@ -4,6 +4,7 @@ from src.environment import TaxiEnvironment
 from src.policy_iteration import PolicyIteration
 from src.animation import TaxiAnimator
 from src.value_iteration import ValueIteration
+from src.q_learning import QLearning
 
 
 def run_policy_iteration(env):
@@ -97,6 +98,31 @@ def run_value_iteration(env):
     
     return vi_policy, vi_time, avg_reward, avg_steps
 
+def run_q_learning(env, num_episodes=5000):
+    """Run Q-Learning and return results"""
+    
+    print("\n" + "=" * 50)
+    print("Q-LEARNING")
+    print("=" * 50)
+    
+    start_time = time.time()
+    q_agent = QLearning(env, alpha=0.1, gamma=0.9, epsilon=0.1)
+    rewards_history, steps_history = q_agent.train(num_episodes=num_episodes, print_every=500)
+    q_time = time.time() - start_time
+    
+    # Extract policy from Q-table
+    q_policy = q_agent.get_policy()
+    
+    # Test policy performance
+    avg_reward, avg_steps = q_agent.test_policy(num_tests=10)
+    
+    print(f"Computation Time: {q_time:.2f}s")
+    print(f"Average Reward: {avg_reward:.1f}")
+    print(f"Average Steps: {avg_steps:.1f}")
+    
+    return q_policy, q_time, avg_reward, avg_steps, rewards_history
+
+
 def main():
     # Create environment
     env = TaxiEnvironment(
@@ -147,6 +173,21 @@ def main():
         animator = TaxiAnimator(env)
         animator.create_animation(vi_policy, "Value Iteration")
         print("✓ Value Iteration animation created!")
+    except Exception as e:
+        print(f"✗ Animation failed: {e}")
+    
+    print("\n" + "=" * 50)
+    print("DEMONSTRATION COMPLETE!")
+    print("=" * 50)
+
+     # Run Q Iteration
+    q_policy, q_time, q_reward, q_steps, q_rewards = run_q_learning(env, num_episodes=5000)
+
+    print("\nCreating animation for Q Iteration...")
+    try:
+        animator = TaxiAnimator(env)
+        animator.create_animation(q_policy, "Q Iteration")
+        print("✓ Q Iteration animation created!")
     except Exception as e:
         print(f"✗ Animation failed: {e}")
     
